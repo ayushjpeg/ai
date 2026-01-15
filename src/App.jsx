@@ -27,7 +27,7 @@ export default function App() {
   const controllerRef = useRef(null);
   const listRef = useRef(null);
   const baseUrl = useMemo(
-    () => (import.meta.env.VITE_OLLAMA_BASE_URL || 'https://ollama-proxy.ayushjpeg.workers.dev').replace(/\/$/, ''),
+    () => (import.meta.env.VITE_OLLAMA_BASE_URL || 'https://ollama.ayux.in').replace(/\/$/, ''),
     []
   );
 
