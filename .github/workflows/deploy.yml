@@ -1,0 +1,39 @@
+name: Build and Deploy AI App
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: [self-hosted, linux]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm run build
+
+      - name: Build Docker image
+        run: docker build -t ai-app:latest .
+
+      - name: Stop existing container (if any)
+        run: docker rm -f ai-app || true
+
+      - name: Run new container
+        run: |
+          docker run -d --restart unless-stopped \
+            --name ai-app \
+            -p 8009:8009 \
+            ai-app:latest
