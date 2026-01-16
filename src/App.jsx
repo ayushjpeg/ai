@@ -5,7 +5,17 @@ import { streamGenerate } from './api/ollama';
 
 const DEFAULT_MODEL = 'llama3.2:3b';
 
+function normalizeContent(content) {
+  if (!content) return '...';
+  const trimmed = content.trim();
+  if (trimmed.startsWith('```') && trimmed.endsWith('```')) {
+    return trimmed.slice(3, -3).trim();
+  }
+  return content;
+}
+
 function MessageBubble({ role, content }) {
+  const safeContent = normalizeContent(content);
   return (
     <div className={`message-row message-row-${role}`}>
       <div className={`message message-${role}`}>
@@ -18,7 +28,7 @@ function MessageBubble({ role, content }) {
             li: (props) => <li {...props} />,
           }}
         >
-          {content || '...'}
+          {safeContent}
         </ReactMarkdown>
       </div>
     </div>
