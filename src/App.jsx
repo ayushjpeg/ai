@@ -1,4 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { streamGenerate } from './api/ollama';
 
 const DEFAULT_MODEL = 'llama3.2:3b';
@@ -7,7 +9,17 @@ function MessageBubble({ role, content }) {
   return (
     <div className={`message-row message-row-${role}`}>
       <div className={`message message-${role}`}>
-        <div className="message-content">{content || '...'}</div>
+        <ReactMarkdown
+          className="message-content"
+          remarkPlugins={[remarkGfm]}
+          components={{
+            p: (props) => <p {...props} />,
+            ul: (props) => <ul {...props} />,
+            li: (props) => <li {...props} />,
+          }}
+        >
+          {content || '...'}
+        </ReactMarkdown>
       </div>
     </div>
   );
