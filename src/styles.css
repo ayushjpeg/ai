@@ -197,6 +197,34 @@ button:hover:not(:disabled) {
   line-height: 1.5;
 }
 
+.messages strong {
+  color: #f6f7fb;
+  font-weight: 700;
+  text-shadow: 0 0 8px rgba(132, 163, 255, 0.4);
+}
+
+.messages ul {
+  margin: 8px 0;
+  padding-left: 20px;
+  list-style: none;
+}
+
+.messages ul li {
+  position: relative;
+  margin-bottom: 6px;
+  padding-left: 16px;
+  color: #cfd7e9;
+}
+
+.messages ul li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+  font-size: 18px;
+  line-height: 1;
+}
+
 .typing {
   color: var(--muted);
   font-size: 13px;
