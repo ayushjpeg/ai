@@ -1,6 +1,4 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
 import { streamGenerate } from './api/ollama';
 
 const DEFAULT_MODEL = 'llama3.2:3b';
@@ -14,22 +12,46 @@ function normalizeContent(content) {
   return content;
 }
 
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function renderSimpleMarkdown(md) {
+  if (!md) return '';
+  // escape first
+  let s = escapeHtml(md);
+  // handle bold **text**
+  s = s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  // handle unordered lists: lines starting with '* '
+  const lines = s.split(/\r?\n/);
+  let inList = false;
+  const out = [];
+  for (let line of lines) {
+    const li = line.trim();
+    if (li.startsWith('* ')) {
+      if (!inList) { out.push('<ul>'); inList = true; }
+      out.push('<li>' + li.slice(2).trim() + '</li>');
+    } else {
+      if (inList) { out.push('</ul>'); inList = false; }
+      if (li === '') out.push('<p></p>'); else out.push('<p>' + li + '</p>');
+    }
+  }
+  if (inList) out.push('</ul>');
+  return out.join('');
+}
+
 function MessageBubble({ role, content }) {
   const safeContent = normalizeContent(content);
+  const html = renderSimpleMarkdown(safeContent);
   return (
     <div className={`message-row message-row-${role}`}>
       <div className={`message message-${role}`}>
-        <ReactMarkdown
-          className="message-content"
-          remarkPlugins={[remarkGfm]}
-          components={{
-            p: (props) => <p {...props} />,
-            ul: (props) => <ul {...props} />,
-            li: (props) => <li {...props} />,
-          }}
-        >
-          {safeContent}
-        </ReactMarkdown>
+        <div className="message-content" dangerouslySetInnerHTML={{ __html: html || '...' }} />
       </div>
     </div>
   );
